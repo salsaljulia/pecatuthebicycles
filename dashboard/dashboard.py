@@ -4,15 +4,15 @@ import seaborn as sns
 import streamlit as st
 from babel.numbers import format_currency
 
-day_df = pd.read_csv("dashboard/day.csv")
+day_df = pd.read_csv("day.csv")
 
-def convert_to_datetime(day_df):
+def convert_to_datetime(df):
     # Konversi kolom 'dteday' ke format datetime
-    day_df['dteday'] = pd.to_datetime(day_df['dteday'])
+    df['dteday'] = pd.to_datetime(df['dteday'])
 
     # Menambahkan kolom tahun dan bulan untuk analisis agregat
-    day_df['yr'] = day_df['dteday'].dt.year
-    day_df['mnth'] = day_df['dteday'].dt.month
+    df['yr'] = df['dteday'].dt.year
+    df['mnth'] = df['dteday'].dt.month
 
     # Mapping angka musim ke nama musim
     season_mapping = {
@@ -21,10 +21,10 @@ def convert_to_datetime(day_df):
         3: 'Summer',
         4: 'Fall'
     }
-    day_df['season_name'] = day_df['season'].map(season_mapping)
+    df['season_name'] = df['season'].map(season_mapping)
 
     # Menambahkan kolom hari dalam minggu
-    day_df['weekday_name'] = day_df['weekday'].dt.day_name()
+    df['weekday_name'] = df['weekday'].dt.day_name()
 
     # Konversi kolom cuaca menjadi kategori untuk efisiensi
     weather_mapping = {
@@ -33,16 +33,16 @@ def convert_to_datetime(day_df):
         3: 'Light Snow or Rain',
         4: 'Heavy Rain or Snow'
     }
-    day_df['weather_name'] = day_df['weathersit'].map(weather_mapping)
+    df['weather_name'] = df['weathersit'].map(weather_mapping)
 
     # Menambahkan kolom untuk indikasi musim panas atau libur
-    day_df['is_summer'] = day_df['season'] == 3
-    day_df['is_holiday'] = day_df['holiday'] == 1
+    df['is_summer'] = df['season'] == 3
+    df['is_holiday'] = df['holiday'] == 1
 
     # Menambahkan kolom gabungan untuk analisis per musim
-    day_df['season_month'] = day_df['season_name'] + " (" + day_df['mnth'].astype(str) + ")"
+    df['season_month'] = df['season_name'] + " (" + df['mnth'].astype(str) + ")"
 
-    return day_df
+    return df
 
 # Konversi kolom datetime dan pengurutan data
 datetime_columns = ["dteday"]
@@ -74,7 +74,7 @@ main_df = day_df[(day_df["dteday"] >= str(start_date)) & (day_df["dteday"] <= st
 st.header('Pecatu Bicycle :sparkles:')
 
 # Pivot table
-pivot_table = day_df.groupby(by="mnth").agg({
+pivot_table = main_df.groupby(by="mnth").agg({
     "instant": "nunique",
     "cnt": ["max", "min", "mean", "std"]
 })
