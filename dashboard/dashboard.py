@@ -74,68 +74,65 @@ main_df = day_df[(day_df["dteday"] >= str(start_date)) & (day_df["dteday"] <= st
 st.header('Pecatu Bicycle :sparkles:')
 
 # Pivot table per Bulan
-pivot_table = main_df.groupby(by="mnth").agg({
+pivot_table_mnth = main_df.groupby(by="mnth").agg({
     "instant": "nunique",
-    "cnt": ["max", "min", "mean", "std"]
+    "cnt": ["mean"]
 })
 
 # Ambil rata-rata (mean) dari cnt untuk setiap bulan
-mean_cnt = pivot_table[('cnt', 'mean')]
+mean_cnt = pivot_table_mnth[('cnt', 'mean')]
 
 # Plot bar chart rata-rata cnt per bulan
 plt.figure(figsize=(10, 6))
 sns.barplot(x=mean_cnt.index, y=mean_cnt.values, palette="viridis")
-plt.title("Mean CNT per Month", fontsize=16)
+plt.title("Rata-Rata Jumlah Terbanyak Penyewa per Bulan", fontsize=16)
 plt.xlabel("Month", fontsize=14)
-plt.ylabel("Mean CNT", fontsize=14)
+plt.ylabel("Rata-rata", fontsize=14)
 plt.xticks(ticks=range(len(mean_cnt.index)), labels=mean_cnt.index)
 plt.grid(axis="y", linestyle="--", alpha=0.7)
 plt.tight_layout()
 st.pyplot(plt)
 
 # Pivot table per Tahun
-pivot_table = main_df.groupby(by="yr").agg({
-    "instant": "nunique",
-    "cnt": ["max", "min", "mean", "std"]
-})
+pivot_table_yr = main_df.groupby(by="yr").agg({
+    "cnt": ["mean"]
+}).reset_index()
 
-# Data untuk rata-rata cnt per tahun
-data = {
-    "yr": [0, 1],
-    "cnt_mean": [3405.76, 5599.93]
-}
-day_df_summary = pd.DataFrame(data).set_index("yr")
+# Merapikan nama kolom
+pivot_table_yr.columns = ["yr", "cnt_mean"]
 
 # Plot bar chart untuk rata-rata cnt per tahun
 plt.figure(figsize=(8, 5))
-plt.bar(day_df_summary.index, day_df_summary["cnt_mean"], color="skyblue", width=0.5, label="Mean CNT")
-plt.title("Mean CNT per Year", fontsize=16)
+plt.bar(pivot_table_yr["yr"], pivot_table_yr["cnt_mean"], color="skyblue", width=0.5, label="Mean CNT")
+
+# Buat label dinamis berdasarkan data
+labels = [f"Year {int(year)}" for year in pivot_table_yr["yr"]]
+
+plt.title("Rata-Rata Jumlah Penyewa per Tahun", fontsize=16)
 plt.xlabel("Year", fontsize=14)
-plt.ylabel("Mean CNT", fontsize=14)
-plt.xticks(ticks=day_df_summary.index, labels=["Year 0", "Year 1"])
+plt.ylabel("Rata-rata Penyewa", fontsize=14)
+plt.xticks(ticks=pivot_table_yr["yr"], labels=labels)  # Gunakan label dinamis
 plt.grid(axis="y", linestyle="--", alpha=0.7)
 plt.legend(fontsize=12)
 plt.tight_layout()
 st.pyplot(plt)
 
-# Pivot table Musim
-pivot_table = main_df.groupby(by="season").agg({
-    "instant": "nunique",
-    "cnt": ["max", "min", "mean", "std"]
-})
+# Pivot table per Musim
+pivot_table_season = main_df.groupby(by="season").agg({
+    "cnt": ["mean"]
+}).reset_index()
 
-# Data untuk rata-rata cnt per musim
-data = {
-    "season": ["Winter", "Spring", "Summer", "Fall"],
-    "cnt_mean": [250, 300, 350, 280]
-}
-df = pd.DataFrame(data)
+# Merapikan nama kolom
+pivot_table_season.columns = ["season", "cnt_mean"]
+
+# Mengakses kolom 'cnt_mean' secara langsung
+mean_cnt = pivot_table_season["cnt_mean"]
 
 # Plot bar chart rata-rata cnt per musim
 plt.figure(figsize=(10, 6))
-sns.barplot(x="season", y="cnt_mean", data=df, palette="coolwarm")
-plt.title("Rata-rata Jumlah (cnt) per Musim", fontsize=16)
-plt.ylabel("Rata-rata (cnt)", fontsize=12)
+sns.barplot(x="season", y="cnt_mean", data=pivot_table_season, palette="coolwarm")
+plt.title("Rata-rata Jumlah Penyewa (cnt) per Musim", fontsize=16)
+plt.ylabel("Rata-rata Penyewa", fontsize=12)
 plt.xlabel("Musim", fontsize=12)
 plt.tight_layout()
 st.pyplot(plt)
