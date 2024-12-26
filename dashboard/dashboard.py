@@ -73,7 +73,7 @@ main_df = day_df[(day_df["dteday"] >= str(start_date)) & (day_df["dteday"] <= st
 # Header aplikasi
 st.header('Pecatu Bicycle :sparkles:')
 
-# Pivot table
+# Pivot table per Bulan
 pivot_table = main_df.groupby(by="mnth").agg({
     "instant": "nunique",
     "cnt": ["max", "min", "mean", "std"]
@@ -92,6 +92,12 @@ plt.xticks(ticks=range(len(mean_cnt.index)), labels=mean_cnt.index)
 plt.grid(axis="y", linestyle="--", alpha=0.7)
 plt.tight_layout()
 st.pyplot(plt)
+
+# Pivot table per Tahun
+pivot_table = main_df.groupby(by="yr").agg({
+    "instant": "nunique",
+    "cnt": ["max", "min", "mean", "std"]
+})
 
 # Data untuk rata-rata cnt per tahun
 data = {
@@ -112,6 +118,12 @@ plt.legend(fontsize=12)
 plt.tight_layout()
 st.pyplot(plt)
 
+# Pivot table Musim
+pivot_table = main_df.groupby(by="season").agg({
+    "instant": "nunique",
+    "cnt": ["max", "min", "mean", "std"]
+})
+
 # Data untuk rata-rata cnt per musim
 data = {
     "season": ["Winter", "Spring", "Summer", "Fall"],
@@ -127,3 +139,5 @@ plt.ylabel("Rata-rata (cnt)", fontsize=12)
 plt.xlabel("Musim", fontsize=12)
 plt.tight_layout()
 st.pyplot(plt)
+
+st.caption('Copyright (c) Salsa Julia Jasmine - 2024')
