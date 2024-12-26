@@ -1,4 +1,4 @@
-# pecatuthebicycles
+# Pecatu The Bicycles
 explains the exploration and visualization of the daily bike rental dataset
 
 # Setup Environment - Shell/Terminal
